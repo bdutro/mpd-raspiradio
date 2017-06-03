@@ -36,7 +36,10 @@ class Timer(object):
             self.thread.join()
 
     def is_running(self):
-        return self.thread.is_alive()
+        if self.thread is None:
+            return False
+        else:
+            return self.thread.is_alive()
 
 class UpdateInterval(Timer):
     class UpdateThread(AbstractTimerThread):
