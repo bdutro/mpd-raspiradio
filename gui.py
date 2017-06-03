@@ -53,7 +53,7 @@ def find_center(total_width, object_width):
     return int(round(float(total_width - object_width) / 2))
 
 class UI(object):
-    def __init__(self, lcd, device_args, config):
+    def __init__(self, lcd, device_args, config, config_section):
         pass
     def on_switch_to(self):
         pass
@@ -63,11 +63,11 @@ class UI(object):
 class Clock(UI):
     __clock_str = '%I:%M %p'
 
-    def __init__(self, lcd, device_args, config):
-        UI.__init__(self, lcd, device_args, config)
+    def __init__(self, lcd, device_args, config, config_section):
+        UI.__init__(self, lcd, device_args, config, config_section)
         self.lcd = lcd
-        self.font = ImageFont.truetype(font=config['clock_font_file'], size=config['clock_font_size'])
-        self.update_thread = timers.UpdateInterval(1.0/config['refresh_rate'], self.tick)
+        self.font = ImageFont.truetype(font=config.get(config_section, 'clock_font_file'), size=config.getint(config_section, 'clock_font_size'))
+        self.update_thread = timers.UpdateInterval(1.0/config.getint(config_section, 'refresh_rate'), self.tick)
         self.cur_time = time.time()
         _, height = self.font.getsize(self.format_time())
         self.y_pos = find_center(device_args.height, height)
@@ -104,8 +104,8 @@ class Clock(UI):
 
 class PlaybackDisplay(UI):
     __fields = ['title', 'artist', 'album']
-    def __init__(self, lcd, device_args, config):
-        UI.__init__(self, lcd, device_args, config)
+    def __init__(self, lcd, device_args, config, config_section):
+        UI.__init__(self, lcd, device_args, config, config_section)
         self.lcd = lcd
         self.track_info = {}
         self.progress = 0
@@ -115,7 +115,7 @@ class PlaybackDisplay(UI):
 
         y_pos = 0
         for field in self.__fields:
-            font = ImageFont.truetype(font=config[field + '_font_file'], size=config[field + '_font_size'])
+            font = ImageFont.truetype(font=config.get(config_section, field + '_font_file'), size=config.getint(config_section, field + '_font_size'))
             self.fonts[field] = font
             self.fonts_y_pos[field] = y_pos
             _, height = font.getsize('M')
@@ -123,8 +123,8 @@ class PlaybackDisplay(UI):
 
         self.progress_bar = ProgressBar(y_pos,
                                         device_args.width,
-                                        ImageFont.truetype(font=config['progress_bar_font_file'],
-                                                           size=config['progress_bar_font_size']))
+                                        ImageFont.truetype(font=config.get(config_section, 'progress_bar_font_file'),
+                                                           size=config.getint(config_section, 'progress_bar_font_size')))
 
     def draw_trackinfo(self, draw):
         for field in self.__fields:
@@ -161,13 +161,13 @@ class Gui(object):
     __ui_types = { GuiModes.CLOCK: Clock,
                    GuiModes.PLAYBACK: PlaybackDisplay
                  }
-    def __init__(self, config):
+    def __init__(self, config, config_section):
         self.mode = None
         self.uis = {}
         self.cur_ui = None
 
         parser = cmdline.create_parser('')
-        device_args = parser.parse_args(config['lcd_config'].split(' '))
+        device_args = parser.parse_args(config.get(config_section, 'lcd_config').split(' '))
 
         try:
             lcd = cmdline.create_device(device_args)
@@ -175,7 +175,7 @@ class Gui(object):
             parser.error(e)
 
         for ui_type, ui_cls in self.__ui_types.items():
-            self.uis[ui_type] = ui_cls(lcd, device_args, config)
+            self.uis[ui_type] = ui_cls(lcd, device_args, config, config_section)
 
     def get_mode(self):
         return self.mode

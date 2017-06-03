@@ -15,11 +15,11 @@ class RaspiradioFrontend(object):
         self.gui_update_client = MPDClient()
         self.gui_update_client.connect("localhost", 6600)
         self.cur_ui = None
-        self.gui = gui.Gui(config['raspiradio'])
+        self.gui = gui.Gui(config, 'raspiradio')
         self.set_gui_mode(gui.GuiModes.CLOCK)
-        self.gui_update_thread = timers.UpdateInterval(1.0/config['raspiradio']['refresh_rate'], self.playback_position_update)
+        self.gui_update_thread = timers.UpdateInterval(1.0/config.getint('raspiradio', 'refresh_rate'), self.playback_position_update)
         self.cur_pos = 0
-        self.timeout_thread = timers.Timeout(config['raspiradio']['inactivity_timeout'], self.switch_to_clock)
+        self.timeout_thread = timers.Timeout(config.getint('raspiradio', 'inactivity_timeout'), self.switch_to_clock)
         self.mpd_update_thread = Thread(target=self.run)
         self.mpd_stop_event = Event()
 
