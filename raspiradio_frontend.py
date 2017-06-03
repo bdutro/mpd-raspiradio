@@ -11,7 +11,7 @@ from mpd import CommandError
 
 CONFIG_FILE = '/etc/raspiradio.conf'
 
-def elapsed(status):
+def get_elapsed(status):
     return float(status.get('elapsed', 0))
 
 class RaspiradioFrontend(object):
@@ -27,7 +27,7 @@ class RaspiradioFrontend(object):
 
     def run(self):
         new_status = self.client.status()
-        new_elapsed = elapsed(new_status)
+        new_elapsed = get_elapsed(new_status)
         if 'songid' in new_status:
             self.switch_to_playback()
             self.update_song_info()
@@ -52,7 +52,7 @@ class RaspiradioFrontend(object):
             #        break
 
             new_status = self.client.status()
-            new_elapsed = elapsed(new_status)
+            new_elapsed = get_elapsed(new_status)
 
             old_songid = status.get('songid')
             new_songid = new_status.get('songid')
@@ -97,7 +97,7 @@ class RaspiradioFrontend(object):
         self.gui_update_thread.stop()
 
     def playback_position_update(self):
-        self.set_progress(elapsed(self.gui_update_client.status()))
+        self.set_progress(get_elapsed(self.gui_update_client.status()))
 
     def switch_to_clock(self):
         self.set_gui_mode(gui.GuiModes.CLOCK)
