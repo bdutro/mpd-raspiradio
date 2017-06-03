@@ -26,6 +26,12 @@ class RaspiradioFrontend(object):
     def run(self):
         new_status = self.client.status()
         new_elapsed = new_status.get('elapsed', 0)
+        if 'songid' in new_status:
+            self.update_song_info()
+            if new_status['state'] == 'play':
+                self.track_playback_started(new_elapsed)
+            elif new_status['state'] == 'pause':
+                self.track_playback_paused(new_elapsed)
 
         while not self.mpd_stop_event.is_set():
             status = new_status
@@ -105,16 +111,19 @@ class RaspiradioFrontend(object):
         self.timeout_thread.stop()
         if self.get_gui_mode() != gui.GuiModes.PLAYBACK:
             self.set_gui_mode(gui.GuiModes.PLAYBACK)
-
-    def track_playback_started(self, elapsed):
-        self.cancel_timeout()
-        self.stop_position_update()
+    
+    def update_song_info(self):
         track = self.client.currentsong()
         self.cur_ui.set_artist(track['artist'])
         self.cur_ui.set_album(track['album'])
         self.cur_ui.set_title(track['title'])
         self.cur_ui.set_track(track['track'])
         self.cur_ui.set_track_length(track['duration'])
+
+    def track_playback_started(self, elapsed):
+        self.cancel_timeout()
+        self.stop_position_update()
+        self.update_song_info()
         self.set_progress(elapsed, force_redraw=True)
         self.start_position_update()
 
