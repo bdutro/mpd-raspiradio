@@ -46,15 +46,16 @@ class RaspiradioFrontend(object):
             new_status = self.client.status()
             new_elapsed = float(new_status.get('elapsed', 0))
 
-            diffkeys = [k for k in status if status[k] != new_status[k]]
+            old_songid = status.get('songid')
+            new_songid = new_status.get('songid')
 
-            if 'songid' in diffkeys:
+            if new_songid is not None and new_songid != old_songid:
                 self.track_playback_started(new_elapsed)
                 continue
 
-            if 'state' in diffkeys:
-                old_state = status['state']
-                new_state = new_status['state']
+            old_state = status['state']
+            new_state = new_status['state']
+            if old_state != new_state:
                 if new_state == 'stop':
                     self.track_playback_ended(new_elapsed)
                 elif new_state == 'play':
@@ -93,7 +94,7 @@ class RaspiradioFrontend(object):
         self.gui_update_thread.stop()
 
     def playback_position_update(self):
-        self.set_progress(float(self.gui_update_client.status()['elapsed']))
+        self.set_progress(float(self.gui_update_client.status().get('elapsed', 0)))
 
     def switch_to_clock(self):
         self.set_gui_mode(gui.GuiModes.CLOCK)
