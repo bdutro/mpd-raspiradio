@@ -2,6 +2,7 @@ import re
 import gui
 import timers
 from PersistentMPDClient.PersistentMPDClient import PersistentMPDClient
+from mpd import CommandError
 from threading import Thread, Event
 import configparser
 import atexit
@@ -36,7 +37,15 @@ class RaspiradioFrontend(object):
             status = new_status
             elapsed = new_elapsed
 
-            self.client.idle('player')
+            self.client.send_idle('player')
+
+            while True:
+                if self.mpd_stop_event.wait(0.1):
+                    self.client.noidle()
+                    break
+                elif select([self.client], [], [], 0)[0]:
+                    self.client.fetch_idle()
+                    break
 
             if self.mpd_stop_event.is_set():
                 break
