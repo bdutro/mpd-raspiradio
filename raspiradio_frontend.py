@@ -1,11 +1,12 @@
 import re
+from select import select
+from threading import Thread, Event
+import configparser
+import atexit
 import gui
 import timers
 from PersistentMPDClient.PersistentMPDClient import PersistentMPDClient
 from mpd import CommandError
-from threading import Thread, Event
-import configparser
-import atexit
 
 CONFIG_FILE = '/etc/raspiradio.conf'
 
