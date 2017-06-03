@@ -1,7 +1,7 @@
 import re
 import gui
 import timers
-from mpd import MPDClient, CommandError
+from .PersistentMPDClient.PersistentMPDClient import PersistentMPDClient
 from threading import Thread, Event
 import configparser
 import atexit
@@ -10,9 +10,9 @@ CONFIG_FILE = '/etc/raspiradio.conf'
 
 class RaspiradioFrontend(object):
     def __init__(self, config):
-        self.client = MPDClient()
+        self.client = PersistentMPDClient()
         self.client.connect("localhost", 6600)
-        self.gui_update_client = MPDClient()
+        self.gui_update_client = PersistentMPDClient()
         self.gui_update_client.connect("localhost", 6600)
         self.cur_ui = None
         self.gui = gui.Gui(config, 'raspiradio')
