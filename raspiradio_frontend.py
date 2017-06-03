@@ -34,7 +34,7 @@ class RaspiradioFrontend(object):
             elif new_status['state'] == 'pause':
                 self.track_playback_paused(new_elapsed)
 
-        while not True:
+        while True:
             status = new_status
             elapsed = new_elapsed
 
