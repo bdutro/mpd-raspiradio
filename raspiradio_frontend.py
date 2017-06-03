@@ -20,9 +20,8 @@ class RaspiradioFrontend(object):
         self.gui_update_thread = timers.UpdateInterval(1.0/config.getint('raspiradio', 'refresh_rate'), self.playback_position_update)
         self.cur_pos = 0
         self.timeout_thread = timers.Timeout(config.getint('raspiradio', 'inactivity_timeout'), self.switch_to_clock)
-        self.mpd_update_thread = Thread(target=self.run)
-        self.mpd_update_thread.daemon = True
-        self.mpd_stop_event = Event()
+        #self.mpd_update_thread = Thread(target=self.run)
+        #self.mpd_stop_event = Event()
 
     def run(self):
         new_status = self.client.status()
@@ -95,7 +94,7 @@ class RaspiradioFrontend(object):
             self.client.noidle()
         except CommandError:
             pass
-        self.mpd_update_thread.join()
+        #self.mpd_update_thread.join()
         self.client.close()
         self.gui_update_client.close()
 
@@ -175,5 +174,5 @@ if __name__ == "__main__":
     config.read(CONFIG_FILE)
 
     frontend = RaspiradioFrontend(config)
-    frontend.start()
     atexit.register(lambda f: f.stop(), frontend)
+    frontend.run()
