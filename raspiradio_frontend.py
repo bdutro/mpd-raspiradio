@@ -11,6 +11,9 @@ from mpd import CommandError
 
 CONFIG_FILE = '/etc/raspiradio.conf'
 
+def elapsed(status):
+    return float(status.get('elapsed', 0))
+
 class RaspiradioFrontend(object):
     def __init__(self, config):
         self.client = PersistentMPDClient(host="localhost", port=6600)
@@ -24,29 +27,32 @@ class RaspiradioFrontend(object):
 
     def run(self):
         new_status = self.client.status()
-        new_elapsed = float(new_status.get('elapsed', 0))
+        new_elapsed = elapsed(new_status)
         if 'songid' in new_status:
             self.switch_to_playback()
             self.update_song_info()
-            if new_status['state'] == 'play':
+            new_state = new_status['state']
+            if new_state == 'play':
                 self.track_playback_started(new_elapsed)
-            elif new_status['state'] == 'pause':
+            elif new_state == 'pause':
                 self.track_playback_paused(new_elapsed)
+            elif new_state == 'stop':
+                self.track_playback_ended(new_elapsed)
 
         while True:
             status = new_status
             elapsed = new_elapsed
 
-            self.client.send_idle('player')
+            self.client.idle('player')
 
-            while True:
-                time.sleep(0.1)
-                if select([self.client], [], [], 0)[0]:
-                    self.client.fetch_idle()
-                    break
+            #while True:
+            #    time.sleep(0.1)
+            #    if select([self.client], [], [], 0)[0]:
+            #        self.client.fetch_idle()
+            #        break
 
             new_status = self.client.status()
-            new_elapsed = float(new_status.get('elapsed', 0))
+            new_elapsed = elapsed(new_status)
 
             old_songid = status.get('songid')
             new_songid = new_status.get('songid')
@@ -91,7 +97,7 @@ class RaspiradioFrontend(object):
         self.gui_update_thread.stop()
 
     def playback_position_update(self):
-        self.set_progress(float(self.gui_update_client.status().get('elapsed', 0)))
+        self.set_progress(elapsed(self.gui_update_client.status()))
 
     def switch_to_clock(self):
         self.set_gui_mode(gui.GuiModes.CLOCK)
