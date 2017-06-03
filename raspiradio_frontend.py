@@ -46,8 +46,8 @@ class RaspiradioFrontend(object):
                 continue
 
             if 'state' in diffkeys:
-                old_state = status['status']
-                new_state = new_status['status']
+                old_state = status['state']
+                new_state = new_status['state']
                 if new_state == 'stop':
                     self.track_playback_ended(new_elapsed)
                 elif new_state == 'play':
