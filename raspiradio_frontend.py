@@ -45,12 +45,6 @@ class RaspiradioFrontend(object):
 
             self.client.idle('player')
 
-            #while True:
-            #    time.sleep(0.1)
-            #    if select([self.client], [], [], 0)[0]:
-            #        self.client.fetch_idle()
-            #        break
-
             new_status = self.client.status()
             new_elapsed = get_elapsed(new_status)
 
