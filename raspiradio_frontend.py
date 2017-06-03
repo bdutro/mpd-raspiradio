@@ -10,10 +10,8 @@ CONFIG_FILE = '/etc/raspiradio.conf'
 
 class RaspiradioFrontend(object):
     def __init__(self, config):
-        self.client = PersistentMPDClient()
-        self.client.connect("localhost", 6600)
-        self.gui_update_client = PersistentMPDClient()
-        self.gui_update_client.connect("localhost", 6600)
+        self.client = PersistentMPDClient(host="localhost", port=6600)
+        self.gui_update_client = PersistentMPDClient(host="localhost", port=6600)
         self.cur_ui = None
         self.gui = gui.Gui(config, 'raspiradio')
         self.set_gui_mode(gui.GuiModes.CLOCK)
