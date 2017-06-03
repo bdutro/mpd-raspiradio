@@ -110,7 +110,8 @@ class RaspiradioFrontend(object):
         self.cur_ui = self.gui.get_ui()
 
     def start_timeout(self):
-        self.timeout_thread.start()
+        if not self.timeout_thread.is_running():
+            self.timeout_thread.start()
 
     def cancel_timeout(self):
         self.timeout_thread.stop()
