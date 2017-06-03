@@ -42,7 +42,10 @@ class RaspiradioFrontend(object):
 
             while True:
                 if self.mpd_stop_event.wait(0.1):
-                    self.client.noidle()
+                    try:
+                        self.client.noidle()
+                    except CommandError:
+                        pass
                     break
                 elif select([self.client], [], [], 0)[0]:
                     self.client.fetch_idle()
