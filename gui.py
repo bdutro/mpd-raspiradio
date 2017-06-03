@@ -174,7 +174,7 @@ class Gui(object):
         except error.Error as e:
             parser.error(e)
 
-        for ui_type, ui_cls in self.__ui_types.iteritems():
+        for ui_type, ui_cls in self.__ui_types.items():
             self.uis[ui_type] = ui_cls(lcd, device_args, config)
 
     def get_mode(self):
