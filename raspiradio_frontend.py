@@ -1,7 +1,7 @@
 import re
 import gui
 import timers
-from PersistentMPDClient import PersistentMPDClient
+from PersistentMPDClient.PersistentMPDClient import PersistentMPDClient
 from threading import Thread, Event
 import configparser
 import atexit
