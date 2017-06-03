@@ -1,0 +1,3 @@
+[submodule "PersistentMPDClient"]
+	path = PersistentMPDClient
+	url = https://github.com/schamp/PersistentMPDClient.git
