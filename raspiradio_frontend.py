@@ -168,4 +168,7 @@ if __name__ == "__main__":
 
     frontend = RaspiradioFrontend(config)
     atexit.register(lambda f: f.stop(), frontend)
-    frontend.run()
+    try:
+        frontend.run()
+    except KeyboardInterrupt:
+        pass
