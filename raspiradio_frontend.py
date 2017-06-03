@@ -21,6 +21,7 @@ class RaspiradioFrontend(object):
         self.cur_pos = 0
         self.timeout_thread = timers.Timeout(config.getint('raspiradio', 'inactivity_timeout'), self.switch_to_clock)
         self.mpd_update_thread = Thread(target=self.run)
+        self.mpd_update_thread.daemon = True
         self.mpd_stop_event = Event()
 
     def run(self):
