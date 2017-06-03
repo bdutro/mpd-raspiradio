@@ -34,25 +34,17 @@ class RaspiradioFrontend(object):
             elif new_status['state'] == 'pause':
                 self.track_playback_paused(new_elapsed)
 
-        while not self.mpd_stop_event.is_set():
+        while not True:
             status = new_status
             elapsed = new_elapsed
 
             self.client.send_idle('player')
 
             while True:
-                if self.mpd_stop_event.wait(0.1):
-                    try:
-                        self.client.noidle()
-                    except CommandError:
-                        pass
-                    break
-                elif select([self.client], [], [], 0)[0]:
+                time.sleep(0.1)
+                if select([self.client], [], [], 0)[0]:
                     self.client.fetch_idle()
                     break
-
-            if self.mpd_stop_event.is_set():
-                break
 
             new_status = self.client.status()
             new_elapsed = float(new_status.get('elapsed', 0))
