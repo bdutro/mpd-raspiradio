@@ -25,7 +25,7 @@ class RaspiradioFrontend(object):
 
     def run(self):
         new_status = self.client.status()
-        new_elapsed = new_status['elapsed']
+        new_elapsed = new_status.get('elapsed', 0)
 
         while not self.mpd_stop_event.is_set():
             status = new_status
